@@ -1,7 +1,7 @@
 package com.nourish1709.project3_security_service.services;
 
 import com.nourish1709.project3_security_service.daos.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,11 +13,16 @@ import java.nio.file.AccessDeniedException;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
+
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     static AccessDeniedException Access_Denied = new AccessDeniedException("Access denied");
+
+    public UserService(UserRepository userRepository,@Lazy PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public UserDetails login(String username, String password) throws AccessDeniedException {
         var user = userRepository.findByUsername(username).orElseThrow(() -> Access_Denied);
