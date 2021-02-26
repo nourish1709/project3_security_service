@@ -8,13 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
 import java.nio.file.AccessDeniedException;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -44,5 +43,10 @@ public class UserController {
     public static class AuthenticationRequest implements Serializable {
         private String username;
         private String password;
+    }
+
+    @GetMapping("/afterLogin")
+    public List<String> afterLogin() {
+        return Arrays.asList("Hello", "Andriana", "Zhenya", "Roman");
     }
 }
