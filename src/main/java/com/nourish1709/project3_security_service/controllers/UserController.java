@@ -24,7 +24,7 @@ public class UserController {
     private final JwtCreateToken jwtCreateToken;
     private final AuthenticationManager authenticationManager;
 
-    @RequestMapping(value = "/ligin", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<String> createAuthToken(@RequestBody AuthenticationRequest auth) throws AccessDeniedException {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(auth.getUsername(), auth.getPassword()));
