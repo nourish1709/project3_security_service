@@ -1,6 +1,5 @@
 package com.nourish1709.project3_security_service.entity.enums;
 
-
 public enum UserAuthority {
     ACCOUNT_READ("account:read"),
     ACCOUNT_WRITE("account_write"),

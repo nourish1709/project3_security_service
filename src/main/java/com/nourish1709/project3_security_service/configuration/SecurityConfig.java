@@ -1,52 +1,57 @@
 package com.nourish1709.project3_security_service.configuration;
 
+import com.nourish1709.project3_security_service.jwt.JwtConfig;
+import com.nourish1709.project3_security_service.jwt.JwtCredentialsAuthenticationFilter;
+import com.nourish1709.project3_security_service.jwt.JwtTokenVerifier;
 import com.nourish1709.project3_security_service.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.SecretKey;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final JwtConfig jwtConfig;
+    private final SecretKey secretKey;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
-//    private final JwtFilter jwtFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .authorizeRequests()
+                    .antMatchers("/sign-up/**", "/login").permitAll()
+                    .anyRequest().authenticated();
+    }
+
+    @PostConstruct
+    public void init() throws Exception {
+        getHttp()
                 .csrf()
                     .disable()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                .authorizeRequests()
-                    .antMatchers("/login").permitAll()
-//                    .antMatchers("/afterLogin").hasRole("USER") //for tests
-                    .antMatchers("/test").permitAll()
-                    .anyRequest().authenticated()
-                    .and()
-                .formLogin();
+                .addFilter(new JwtCredentialsAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+                .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtCredentialsAuthenticationFilter.class);
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
@@ -57,31 +62,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         provider.setUserDetailsService(userService);
         return provider;
     }
-
-    /*@Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        auth.inMemoryAuthentication().passwordEncoder(encoder)
-                .withUser("temp")
-                .password(encoder.encode("secret"))
-                .roles("USER");
-//        this method for future tests ;) may be
-    }*/
-
-    /*@PostConstruct
-    public void init() throws Exception {
-        getHttp().addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }*/
-
-    /*@Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(new BCryptPasswordEncoder());
-    }*/
-
-    /*@Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }*/
 }

@@ -2,9 +2,8 @@ package com.nourish1709.project3_security_service.services;
 
 import com.nourish1709.project3_security_service.daos.UserRepository;
 import com.nourish1709.project3_security_service.entity.User;
-import com.nourish1709.project3_security_service.entity.enums.UserRole;
+import com.nourish1709.project3_security_service.exceptions.IncorrectCredentialsException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,24 +24,13 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    static AccessDeniedException accessDenied = new AccessDeniedException("Access denied");
-
-    /*public UserService(UserRepository userRepository,@Lazy PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }*/
-
-    /*public UserDetails login(String username, String password) throws AccessDeniedException {
-        var user = userRepository.findByUsername(username).orElseThrow(() -> accessDenied);
-        if (!passwordEncoder.matches(password, user.getPassword()))
-            throw accessDenied;
-        return user;
-    }*/
-
+    private static final String SECRET = "secret";
+    private static final String EMAIL = "email";
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow();
+        return userRepository.findByUsername(username)
+                .orElseThrow(IncorrectCredentialsException::new);
     }
 
     @PostConstruct
@@ -52,29 +39,36 @@ public class UserService implements UserDetailsService {
                 new User(
                         1L,
                         "Oleg",
-                        "secret",
-                        "email",
+                        passwordEncoder.encode(SECRET),
+                        EMAIL,
                         ADMIN
                 ),
                 new User(
                         2L,
                         "Roman",
-                        "secret",
-                        "email",
+                        passwordEncoder.encode(SECRET),
+                        EMAIL,
                         ADMIN
                 ),
                 new User(
                         3L,
                         "Andriana",
-                        "secret",
-                        "email",
+                        passwordEncoder.encode(SECRET),
+                        EMAIL,
                         ADMIN
                 ),
                 new User(
                         4L,
+                        "zhenya",
+                        passwordEncoder.encode(SECRET),
+                        EMAIL,
+                        ADMIN
+                ),
+                new User(
+                        5L,
                         "user",
-                        "secret",
-                        "email",
+                        passwordEncoder.encode(SECRET),
+                        EMAIL,
                         USER
                 )
         );
