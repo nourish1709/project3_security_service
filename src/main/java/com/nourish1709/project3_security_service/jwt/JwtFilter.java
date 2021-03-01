@@ -1,4 +1,4 @@
-package com.nourish1709.project3_security_service.JwtUtill;
+package com.nourish1709.project3_security_service.jwt;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

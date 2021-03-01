@@ -1,9 +1,9 @@
 package com.nourish1709.project3_security_service.controllers;
 
-import com.nourish1709.project3_security_service.JwtUtill.JwtCreateToken;
 import com.nourish1709.project3_security_service.services.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,14 +16,17 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+//@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-    private final JwtCreateToken jwtCreateToken;
-    private final AuthenticationManager authenticationManager;
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @GetMapping("/test")
+    public ResponseEntity<List<String>> afterLogin() {
+        List<String> list = Arrays.asList("Oleg", "Andriana", "Zhenya", "Roman");
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    /*@RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<String> createAuthToken(@RequestBody AuthenticationRequest auth) throws AccessDeniedException {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(auth.getUsername(), auth.getPassword()));
@@ -48,5 +51,5 @@ public class UserController {
     @GetMapping("/afterLogin")
     public List<String> afterLogin() {
         return Arrays.asList("Hello", "Andriana", "Zhenya", "Roman");
-    }
+    }*/
 }
