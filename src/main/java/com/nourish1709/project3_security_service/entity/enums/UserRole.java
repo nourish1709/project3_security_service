@@ -5,11 +5,21 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.nourish1709.project3_security_service.entity.enums.UserAuthority.*;
+
 public enum UserRole {
-    ADMIN(Set.of(UserAuthority.ROLE_ACCOUNT_READ, UserAuthority.ROLE_ACCOUNT_WRITE,
-            UserAuthority.ROLE_CATEGORY_READ, UserAuthority.ROLE_CATEGORY_WRITE, UserAuthority.ROLE_POSITION_WRITE)),
-    USER(Set.of(UserAuthority.ROLE_NOTIFICATION_WRITE, UserAuthority.ROLE_CATEGORY_READ,
-    UserAuthority.ROLE_POSITION_READ));
+    ADMIN(Set.of(
+            NOTIFICATION_WRITE,
+            ACCOUNT_READ,
+            ACCOUNT_WRITE,
+            CATEGORY_WRITE,
+            POSITION_WRITE)
+    ),
+    USER(Set.of(
+            NOTIFICATION_WRITE,
+            CATEGORY_READ,
+            POSITION_READ)
+    );
 
     private final Set<UserAuthority> authorities;
 
@@ -23,11 +33,11 @@ public enum UserRole {
     }
 
     public Set<SimpleGrantedAuthority> getGrantedAuthorities() {
-        Set<SimpleGrantedAuthority> authorities = getAuthorities().stream()
+        Set<SimpleGrantedAuthority> grantedAuthorities = getAuthorities().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
                 .collect(Collectors.toSet());
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
-        return authorities;
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
+        return grantedAuthorities;
     }
 }
 
